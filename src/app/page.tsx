@@ -1,102 +1,199 @@
-import Image from 'next/image'
-import { Inter } from 'next/font/google'
-import styles from './page.module.css'
+import Graph from "@/components/graph";
+import styles from "./page.module.scss";
 
-const inter = Inter({ subsets: ['latin'] })
+export type DailyData = {
+  date: string;
+  weight: string;
+  energy: string;
+  energyTarget: string;
+  protein: string;
+  proteinTarget: string;
+  lipid: string;
+  lipidTarget: string;
+  carbohydrate: string;
+  carbohydrateTarget: string;
+};
 
-export default function Home() {
+type DishData = {
+  date: string;
+  time: string;
+  menu: string;
+};
+
+type ResponseJson = {
+  dailyValues: DailyData[];
+  dishValues: DishData[];
+};
+
+// 文字列から数字を抽出する
+const extractNumber = (str: string): number => {
+  const match = str.match(/\d+/);
+  return match ? +match[0] : 0;
+};
+
+export default async function Home() {
+  const today = new Date()
+    .toLocaleDateString("sv-SE", {
+      timeZone: "Asia/Tokyo",
+    })
+    .replaceAll("-", "/");
+  const res = await fetch(
+    "https://script.google.com/macros/s/AKfycbxShAvH9AubWSehz6HvlV9xeBreZTqb9WhOaSsDSLKWfjv37M0EeBu6tNnlbn6rmwCN/exec",
+    {
+      next: {
+        revalidate: 60,
+      },
+    }
+  );
+  const data: ResponseJson = await res.json();
   return (
     <main className={styles.main}>
-      <div className={styles.description}>
-        <p>
-          Get started by editing&nbsp;
-          <code className={styles.code}>src/app/page.tsx</code>
-        </p>
-        <div>
-          <a
-            href="https://vercel.com?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            By{' '}
-            <Image
-              src="/vercel.svg"
-              alt="Vercel Logo"
-              className={styles.vercelLogo}
-              width={100}
-              height={24}
-              priority
-            />
-          </a>
-        </div>
-      </div>
-
-      <div className={styles.center}>
-        <Image
-          className={styles.logo}
-          src="/next.svg"
-          alt="Next.js Logo"
-          width={180}
-          height={37}
-          priority
-        />
-      </div>
-
-      <div className={styles.grid}>
-        <a
-          href="https://beta.nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={inter.className}>
-            Docs <span>-&gt;</span>
-          </h2>
-          <p className={inter.className}>
-            Find in-depth information about Next.js features and API.
-          </p>
-        </a>
-
-        <a
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={inter.className}>
-            Learn <span>-&gt;</span>
-          </h2>
-          <p className={inter.className}>
-            Learn about Next.js in an interactive course with&nbsp;quizzes!
-          </p>
-        </a>
-
-        <a
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={inter.className}>
-            Templates <span>-&gt;</span>
-          </h2>
-          <p className={inter.className}>Explore the Next.js 13 playground.</p>
-        </a>
-
-        <a
-          href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={inter.className}>
-            Deploy <span>-&gt;</span>
-          </h2>
-          <p className={inter.className}>
-            Instantly deploy your Next.js site to a shareable URL with Vercel.
-          </p>
-        </a>
-      </div>
+      <h2 className={styles.title}>体重/摂取栄養素</h2>
+      <table className={styles.table}>
+        <thead>
+          <tr>
+            <th rowSpan={2}>日付</th>
+            <th rowSpan={2}>体重</th>
+            <th colSpan={2}>
+              エネルギー
+              <br />
+              [kcal]
+            </th>
+            <th colSpan={2}>タンパク質[g]</th>
+            <th colSpan={2}>脂質[g]</th>
+            <th colSpan={2}>炭水化物[g]</th>
+          </tr>
+          <tr>
+            <th>摂取</th>
+            <th>
+              目標
+              <br />
+              まで
+            </th>
+            <th>摂取</th>
+            <th>
+              目標
+              <br />
+              まで
+            </th>
+            <th>摂取</th>
+            <th>
+              目標
+              <br />
+              まで
+            </th>
+            <th>摂取</th>
+            <th>
+              目標
+              <br />
+              まで
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          {data.dailyValues.map((dailyValue) => (
+            <tr key={dailyValue.date}>
+              <td>{dailyValue.date.split("/").slice(1, 3).join("\n")}</td>
+              <td>
+                {dailyValue.weight ||
+                  (today < dailyValue.date ? "-" : "未測定")}
+              </td>
+              <td
+                className={
+                  dailyValue.energyTarget.startsWith("-")
+                    ? styles["td-red"]
+                    : styles["td-green"]
+                }
+              >
+                {dailyValue.energy.slice(0, -4)}
+              </td>
+              <td
+                className={
+                  dailyValue.energyTarget.startsWith("-")
+                    ? styles["td-red"]
+                    : styles["td-green"]
+                }
+              >
+                {dailyValue.energyTarget.slice(0, -4)}
+              </td>
+              <td
+                className={
+                  extractNumber(dailyValue.proteinTarget) < 20
+                    ? styles["td-green"]
+                    : styles["td-red"]
+                }
+              >
+                {dailyValue.protein.slice(0, -1)}
+              </td>
+              <td
+                className={
+                  extractNumber(dailyValue.proteinTarget) < 20
+                    ? styles["td-green"]
+                    : styles["td-red"]
+                }
+              >
+                {dailyValue.proteinTarget.slice(0, -1)}
+              </td>
+              <td
+                className={
+                  extractNumber(dailyValue.lipidTarget) < 15
+                    ? styles["td-green"]
+                    : styles["td-red"]
+                }
+              >
+                {dailyValue.lipid.slice(0, -1)}
+              </td>
+              <td
+                className={
+                  extractNumber(dailyValue.lipidTarget) < 15
+                    ? styles["td-green"]
+                    : styles["td-red"]
+                }
+              >
+                {dailyValue.lipidTarget.slice(0, -1)}
+              </td>
+              <td
+                className={
+                  extractNumber(dailyValue.carbohydrateTarget) < 20
+                    ? styles["td-green"]
+                    : styles["td-red"]
+                }
+              >
+                {dailyValue.carbohydrate.slice(0, -1)}
+              </td>
+              <td
+                className={
+                  extractNumber(dailyValue.carbohydrateTarget) < 20
+                    ? styles["td-green"]
+                    : styles["td-red"]
+                }
+              >
+                {dailyValue.carbohydrateTarget.slice(0, -1)}
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+      <Graph dailyValues={data.dailyValues}/>
+      <h2 className={styles.title}>飯</h2>
+      <table className={`${styles.striped} ${styles.table}`}>
+        <thead>
+          <tr>
+            <th>日付</th>
+            <th>時間帯</th>
+            <th>メニュー</th>
+          </tr>
+        </thead>
+        <tbody>
+          {data.dishValues.map((dish) => (
+            <tr key={`${dish.date}-${dish.time}-${dish.menu}`}>
+              <td>{dish.date}</td>
+              <td>{dish.time}</td>
+              <td>{dish.menu}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
     </main>
-  )
+  );
 }

@@ -1,0 +1,46 @@
+.main {
+  width: 100vw;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-bottom: 2rem;
+}
+
+.table {
+  border-spacing: 0;
+  max-width: 100vw;
+  font-size: small;
+  td,
+  th {
+    padding: 0.3rem;
+  }
+  thead > tr {
+    background-color: #333;
+    color: white;
+  }
+  tbody > tr > td {
+    text-align: right;
+    border: 1px solid #333;
+  }
+}
+
+.striped {
+  tbody > tr:nth-child(odd) {
+    background-color: #ccc;
+  }
+}
+
+.td-red {
+  background-color: rgb(255, 195, 195);
+}
+
+.td-green {
+  background-color: rgb(196, 255, 196);
+}
+
+.title {
+  font-size: 1.5rem;
+  font-weight: bold;
+  margin: 1.5rem 0 0;
+}
