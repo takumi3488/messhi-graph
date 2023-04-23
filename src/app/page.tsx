@@ -101,7 +101,7 @@ export default async function Home() {
               <td>{dailyValue.date.split("/").slice(1, 3).join("\n")}</td>
               <td>
                 {dailyValue.weight ||
-                  (today < dailyValue.date ? "-" : "未測定")}
+                  (today < dailyValue.date ? "-" : "測定なし")}
               </td>
               {"energy" in dailyValue ? (
                 <>
