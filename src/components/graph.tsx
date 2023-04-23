@@ -42,6 +42,8 @@ export default function Graph({
           {
             label: "体重",
             data: dailyWeights.map((dailyWeight) => dailyWeight[1]),
+            backgroundColor: "rgb(53, 162, 235)",
+            borderColor: "rgb(53, 162, 235, 0.5)",
           },
         ],
       }}
