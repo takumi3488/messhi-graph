@@ -1,9 +1,12 @@
 import Graph from "@/components/graph";
 import styles from "./page.module.scss";
 
-export type DailyData = {
+type DateWeight = {
   date: string;
   weight: string;
+};
+
+type DateEnergy = {
   energy: string;
   energyTarget: string;
   protein: string;
@@ -13,6 +16,8 @@ export type DailyData = {
   carbohydrate: string;
   carbohydrateTarget: string;
 };
+
+export type DailyData = DateWeight | (DateWeight & DateEnergy);
 
 type DishData = {
   date: string;
@@ -98,83 +103,89 @@ export default async function Home() {
                 {dailyValue.weight ||
                   (today < dailyValue.date ? "-" : "未測定")}
               </td>
-              <td
-                className={
-                  dailyValue.energyTarget.startsWith("-")
-                    ? styles["td-red"]
-                    : styles["td-green"]
-                }
-              >
-                {dailyValue.energy.slice(0, -4)}
-              </td>
-              <td
-                className={
-                  dailyValue.energyTarget.startsWith("-")
-                    ? styles["td-red"]
-                    : styles["td-green"]
-                }
-              >
-                {dailyValue.energyTarget.slice(0, -4)}
-              </td>
-              <td
-                className={
-                  extractNumber(dailyValue.proteinTarget) < 20
-                    ? styles["td-green"]
-                    : styles["td-red"]
-                }
-              >
-                {dailyValue.protein.slice(0, -1)}
-              </td>
-              <td
-                className={
-                  extractNumber(dailyValue.proteinTarget) < 20
-                    ? styles["td-green"]
-                    : styles["td-red"]
-                }
-              >
-                {dailyValue.proteinTarget.slice(0, -1)}
-              </td>
-              <td
-                className={
-                  extractNumber(dailyValue.lipidTarget) < 15
-                    ? styles["td-green"]
-                    : styles["td-red"]
-                }
-              >
-                {dailyValue.lipid.slice(0, -1)}
-              </td>
-              <td
-                className={
-                  extractNumber(dailyValue.lipidTarget) < 15
-                    ? styles["td-green"]
-                    : styles["td-red"]
-                }
-              >
-                {dailyValue.lipidTarget.slice(0, -1)}
-              </td>
-              <td
-                className={
-                  extractNumber(dailyValue.carbohydrateTarget) < 20
-                    ? styles["td-green"]
-                    : styles["td-red"]
-                }
-              >
-                {dailyValue.carbohydrate.slice(0, -1)}
-              </td>
-              <td
-                className={
-                  extractNumber(dailyValue.carbohydrateTarget) < 20
-                    ? styles["td-green"]
-                    : styles["td-red"]
-                }
-              >
-                {dailyValue.carbohydrateTarget.slice(0, -1)}
-              </td>
+              {"energy" in dailyValue ? (
+                <>
+                  <td
+                    className={
+                      dailyValue.energyTarget.startsWith("-")
+                        ? styles["td-red"]
+                        : styles["td-green"]
+                    }
+                  >
+                    {dailyValue.energy.slice(0, -4)}
+                  </td>
+                  <td
+                    className={
+                      dailyValue.energyTarget.startsWith("-")
+                        ? styles["td-red"]
+                        : styles["td-green"]
+                    }
+                  >
+                    {dailyValue.energyTarget.slice(0, -4)}
+                  </td>
+                  <td
+                    className={
+                      extractNumber(dailyValue.proteinTarget) < 20
+                        ? styles["td-green"]
+                        : styles["td-red"]
+                    }
+                  >
+                    {dailyValue.protein.slice(0, -1)}
+                  </td>
+                  <td
+                    className={
+                      extractNumber(dailyValue.proteinTarget) < 20
+                        ? styles["td-green"]
+                        : styles["td-red"]
+                    }
+                  >
+                    {dailyValue.proteinTarget.slice(0, -1)}
+                  </td>
+                  <td
+                    className={
+                      extractNumber(dailyValue.lipidTarget) < 15
+                        ? styles["td-green"]
+                        : styles["td-red"]
+                    }
+                  >
+                    {dailyValue.lipid.slice(0, -1)}
+                  </td>
+                  <td
+                    className={
+                      extractNumber(dailyValue.lipidTarget) < 15
+                        ? styles["td-green"]
+                        : styles["td-red"]
+                    }
+                  >
+                    {dailyValue.lipidTarget.slice(0, -1)}
+                  </td>
+                  <td
+                    className={
+                      extractNumber(dailyValue.carbohydrateTarget) < 20
+                        ? styles["td-green"]
+                        : styles["td-red"]
+                    }
+                  >
+                    {dailyValue.carbohydrate.slice(0, -1)}
+                  </td>
+                  <td
+                    className={
+                      extractNumber(dailyValue.carbohydrateTarget) < 20
+                        ? styles["td-green"]
+                        : styles["td-red"]
+                    }
+                  >
+                    {dailyValue.carbohydrateTarget.slice(0, -1)}
+                  </td>
+                </>
+              ) : (
+                <td colSpan={8}>データなし</td>
+              )}
             </tr>
           ))}
         </tbody>
       </table>
-      <Graph dailyValues={data.dailyValues}/>
+      <Graph dailyValues={data.dailyValues} />
       <h2 className={styles.title}>飯</h2>
       <table className={`${styles.striped} ${styles.table}`}>
         <thead>
