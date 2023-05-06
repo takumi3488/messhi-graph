@@ -34,10 +34,18 @@ export default function Graph({
         [dailyValue.date, +dailyValue.weight.slice(0, -2)] as [string, number]
     )
     .filter((dailyWeight) => dailyWeight[1] > 0);
+  const labelCount = 5;
+  const diff = Math.floor(dailyWeights.length / (labelCount - 1));
+  const start = dailyWeights.length - diff * (labelCount - 1);
+  const labels = dailyWeights.map((dailyWeight, i) => {
+    if (i === 0 || (i + start - 1) % diff === 0)
+      return dailyWeight[0].split("/").slice(1, 3).join("/");
+    return "";
+  });
   return (
     <Line
       data={{
-        labels: dailyWeights.map((dailyWeight) => dailyWeight[0]),
+        labels,
         datasets: [
           {
             label: "体重",
